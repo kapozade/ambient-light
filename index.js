@@ -8,6 +8,7 @@ let borderWidth = 40;
 let keepAliveInterval = null;
 let isUpdatingPositions = false;
 let pendingUpdate = false;
+let currentColor = { r: 255, g: 255, b: 255 }; // Default to white
 
 function debounce(func, wait) {
   let timeout;
@@ -24,7 +25,7 @@ function debounce(func, wait) {
 function keepFramesOnTop() {
   frames.forEach(frame => {
     if (!frame.isDestroyed()) {
-      frame.setAlwaysOnTop(true, "screen-saver", 1);
+      frame.setAlwaysOnTop(true, "floating", 1);
       frame.moveTop();
     }
   });
@@ -41,7 +42,6 @@ function updateFramePositions() {
   try {
     const displays = screen.getAllDisplays();
     const primaryDisplay = displays[0];
-    
     const workArea = primaryDisplay.workArea;
     
     if (frames.length >= 4) {
@@ -52,7 +52,7 @@ function updateFramePositions() {
         { frame: frames[1], bounds: { x: workArea.x, y: workArea.y + workArea.height - borderWidth, width: workArea.width, height: borderWidth } },
         // Left frame
         { frame: frames[2], bounds: { x: workArea.x, y: workArea.y, width: borderWidth, height: workArea.height } },
-        // Right frame
+        // Riggt frame
         { frame: frames[3], bounds: { x: workArea.x + workArea.width - borderWidth, y: workArea.y, width: borderWidth, height: workArea.height } }
       ];
       
@@ -110,12 +110,21 @@ function attachSpaceListeners() {
 
 function updateBrightness(value) {
   brightness = value;
-  
-  const script = `document.body.style.backgroundColor = 'rgba(255, 255, 255, ${brightness})';`;
+  updateFrameColors();
+}
+
+function updateColor(r, g, b) {
+  currentColor = { r, g, b };
+  updateFrameColors();
+}
+
+function updateFrameColors() {
+  const script = `document.body.style.backgroundColor = 'rgba(${currentColor.r}, ${currentColor.g}, ${currentColor.b}, ${brightness})';`;
   
   frames.forEach(frame => {
     if (!frame.isDestroyed() && frame.webContents && !frame.webContents.isDestroyed()) {
       frame.webContents.executeJavaScript(script).catch(() => {
+        // Silently handle errors if webContents is not ready
       });
     }
   });
@@ -140,11 +149,11 @@ function createAmbientLight() {
     fullscreen: false,
     kiosk: false,
     fullscreenable: false,
-    show: false,
+    show: false, // Don't show immediately
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      backgroundThrottling: false
+      backgroundThrottling: false // Prevent throttling when not focused
     }
   };
   
@@ -186,7 +195,7 @@ function createAmbientLight() {
   const totalFrames = frames.length;
   
   frames.forEach((frame, index) => {
-    frame.setAlwaysOnTop(true, 'screen-saver', 1);
+    frame.setAlwaysOnTop(true, 'floating', 1);
     frame.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
     
     if (process.platform === 'darwin') {
@@ -197,10 +206,11 @@ function createAmbientLight() {
     
     frame.webContents.on('did-finish-load', () => {
       frame.webContents.executeJavaScript(`
-        document.body.style.backgroundColor = 'rgba(255, 255, 255, ${brightness})';
+        document.body.style.backgroundColor = 'rgba(${currentColor.r}, ${currentColor.g}, ${currentColor.b}, ${brightness})';
       `).then(() => {
         loadedCount++;
         
+        // Show all frames together once all are loaded
         if (loadedCount === totalFrames) {
           frames.forEach(f => {
             if (!f.isDestroyed()) {
@@ -257,6 +267,48 @@ function createTray() {
             }
           });
         }
+      },
+      { type: 'separator' },
+      {
+        label: '🎨 Colors',
+        submenu: [
+          {
+            label: '⚪ White',
+            click: () => {
+              updateColor(255, 255, 255);
+            }
+          },
+          {
+            label: '🟡 Warm White',
+            click: () => {
+              updateColor(255, 250, 240);
+            }
+          },
+          {
+            label: '🟠 Orange',
+            click: () => {
+              updateColor(255, 200, 150);
+            }
+          },
+          {
+            label: '🔴 Red',
+            click: () => {
+              updateColor(255, 100, 100);
+            }
+          },
+          {
+            label: '🔵 Blue',
+            click: () => {
+              updateColor(200, 220, 255);
+            }
+          },
+          {
+            label: '🟢 Green',
+            click: () => {
+              updateColor(200, 255, 200);
+            }
+          }
+        ]
       },
       {
         label: '☀️ Brightness',

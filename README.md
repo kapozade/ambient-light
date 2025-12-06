@@ -10,7 +10,8 @@ Tested on **macOS Thaoe 26.1**.
 ## Features
 
 - Full-screen transparent overlay  
-- White ambient light frame on all screen edges  
+- White ambient light frame on all screen edges
+- Ability to select colors
 - Non-intrusive (mouse events pass through to underlying applications)  
 - Can be packaged as a standalone macOS application
 
