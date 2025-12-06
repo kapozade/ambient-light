@@ -4,7 +4,7 @@ const path = require('path');
 let frames = [];
 let tray = null;
 let brightness = 0.9;
-let borderWidth = 40;
+let borderWidth = 50;
 let keepAliveInterval = null;
 let isUpdatingPositions = false;
 let pendingUpdate = false;
@@ -281,13 +281,13 @@ function createTray() {
           {
             label: '🟡 Warm White',
             click: () => {
-              updateColor(255, 250, 240);
+              updateColor(255, 214, 170);
             }
           },
           {
             label: '🟠 Orange',
             click: () => {
-              updateColor(255, 200, 150);
+              updateColor(255, 150, 50);
             }
           },
           {
