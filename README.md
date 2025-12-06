@@ -41,6 +41,6 @@ npx electron-packager . "Ambient Light" \
 
 The packaged application will be generated inside the `dist/` directory.
 
--- 
+---
 
 Special thanks to [Başak Ülker ❤️](https://github.com/BasakUlker) for her feedbacks
