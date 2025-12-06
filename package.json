@@ -1,0 +1,41 @@
+{
+  "name": "ambient-light",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac",
+    "build-dir": "electron-builder --mac --dir"
+  },
+  "build": {
+    "appId": "com.onurkapcik-ambientlight.app",
+    "productName": "Ambient Light",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "icon.png",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "files": [
+      "index.js",
+      "index.html",
+      "icon.png",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "electron": "31.0.0"
+  },
+  "devDependencies": {
+    "electron-builder": "24.13.3"
+  },
+  "icon": "icon.icns"
+}
